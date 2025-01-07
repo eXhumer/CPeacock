@@ -55,11 +55,11 @@ const defaultFlags: Flags = {
     },
     leaderboards: {
         desc: "[Services] Allow your times to be submitted to the ingame leaderboards. If you do not want your times on the leaderboards, change this to false.",
-        default: true,
+        default: false,
     },
     updateChecking: {
         desc: "[Services] Allow Peacock to check for updates on startup.",
-        default: true,
+        default: false,
     },
     loadoutSaving: {
         desc: "[Services] Default loadout mode - either PROFILES (loadout profiles) or LEGACY for per-user saving",
@@ -71,7 +71,11 @@ const defaultFlags: Flags = {
     },
     imageLoading: {
         desc: "[Services] How images are loaded. SAVEASREQUESTED will fetch images from online when needed (and save them in the images folder), ONLINE will fetch them without saving, and OFFLINE will load them from the image folder",
-        default: "SAVEASREQUESTED",
+        default: "OFFLINE",
+    },
+    bypassEntitlementsCheck: {
+        desc: "[Services] When set to true, Peacock will not check for entitlements.",
+        default: true,
     },
     liveSplit: {
         desc: "[Splitter] Toggle LiveSplit support on or off",

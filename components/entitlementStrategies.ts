@@ -20,6 +20,8 @@ import { AxiosError, AxiosResponse } from "axios"
 import { log, LogLevel } from "./loggingInterop"
 import { userAuths } from "./officialServerAuth"
 import {
+    ALL_EPIC_ENTITLEMENTS,
+    ALL_STEAM_ENTITLEMENTS,
     EPIC_NAMESPACE_2021,
     FRANKENSTEIN_SNIPER_ENTITLEMENTS,
     getEpicEntitlements,
@@ -28,6 +30,7 @@ import {
 } from "./platformEntitlements"
 import { GameVersion } from "./types/types"
 import { getRemoteService } from "./utils"
+import { getFlag } from "./flags"
 
 /**
  * The base class for an entitlement strategy.
@@ -48,6 +51,10 @@ abstract class EntitlementStrategy {
  */
 export class EpicH3Strategy extends EntitlementStrategy {
     override async get(accessToken: string, userId: string) {
+        if (getFlag("bypassEntitlementsCheck") === true) {
+            return ALL_EPIC_ENTITLEMENTS
+        }
+
         return await getEpicEntitlements(
             EPIC_NAMESPACE_2021,
             userId,
@@ -74,6 +81,10 @@ export class IOIStrategy extends EntitlementStrategy {
     }
 
     override async get(userId: string) {
+        if (getFlag("bypassEntitlementsCheck") === true) {
+            return ALL_STEAM_ENTITLEMENTS
+        }
+
         if (!userAuths.has(userId)) {
             log(LogLevel.ERROR, `No user data found for ${userId}.`)
             return []
@@ -118,6 +129,10 @@ export class IOIStrategy extends EntitlementStrategy {
  */
 export class EpicH1Strategy extends EntitlementStrategy {
     override get() {
+        if (getFlag("bypassEntitlementsCheck") === true) {
+            return ALL_EPIC_ENTITLEMENTS
+        }
+
         return [
             "0a73eaedcac84bd28b567dbec764c5cb", // Hitman 1 standard edition
             "81aecb49a60b47478e61e1cbd68d63c5", // Hitman 1 GOTY upgrade
@@ -132,6 +147,10 @@ export class EpicH1Strategy extends EntitlementStrategy {
  */
 export class SteamScpcStrategy extends EntitlementStrategy {
     override get() {
+        if (getFlag("bypassEntitlementsCheck") === true) {
+            return ALL_STEAM_ENTITLEMENTS
+        }
+
         return FRANKENSTEIN_SNIPER_ENTITLEMENTS
     }
 }
@@ -143,6 +162,10 @@ export class SteamScpcStrategy extends EntitlementStrategy {
  */
 export class SteamH1Strategy extends EntitlementStrategy {
     override get() {
+        if (getFlag("bypassEntitlementsCheck") === true) {
+            return ALL_STEAM_ENTITLEMENTS
+        }
+
         return [
             STEAM_NAMESPACE_2016,
             "439870",
@@ -165,6 +188,10 @@ export class SteamH1Strategy extends EntitlementStrategy {
  */
 export class SteamH2Strategy extends EntitlementStrategy {
     override get() {
+        if (getFlag("bypassEntitlementsCheck") === true) {
+            return ALL_STEAM_ENTITLEMENTS
+        }
+
         return H2_STEAM_ENTITLEMENTS
     }
 }

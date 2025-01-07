@@ -517,6 +517,8 @@ app.all("*", (req, res) => {
 
 app.use(errorLoggingMiddleware)
 
+const randomNumber = Math.random()
+
 export async function startServer(options: {
     hmr: boolean
     pluginDevHost: boolean
@@ -525,7 +527,9 @@ export async function startServer(options: {
 
     if (!IS_LAUNCHER) {
         console.log(
-            picocolors.greenBright(`
+            (getFlag("bypassEntitlementsCheck") === true && randomNumber < 0.01
+                ? picocolors.blue
+                : picocolors.greenBright)(`
  ███████████  ██████████   █████████     █████████     ███████      █████████  █████   ████
 ░░███░░░░░███░░███░░░░░█  ███░░░░░███   ███░░░░░███  ███░░░░░███   ███░░░░░███░░███   ███░
  ░███    ░███ ░███  █ ░  ░███    ░███  ███     ░░░  ███     ░░███ ███     ░░░  ░███  ███
@@ -540,7 +544,7 @@ export async function startServer(options: {
 
     log(
         LogLevel.INFO,
-        `This is Peacock v${PEACOCKVERSTRING} with Node v${process.versions.node}.`,
+        `This is Peacock v${PEACOCKVERSTRING}${getFlag("bypassEntitlementsCheck") === true ? "-" + picocolors.green("crack") : ""} with Node v${process.versions.node}.`,
     )
 
     if (getFlag("jokes") === true) {
@@ -549,6 +553,25 @@ export async function startServer(options: {
             picocolors.yellowBright(
                 `${jokes[random.int(0, jokes.length - 1)]}`,
             ),
+        )
+    }
+
+    if (getFlag("bypassEntitlementsCheck") === true && randomNumber < 0.01) {
+        log(
+            LogLevel.INFO,
+            picocolors.blue(
+                `Much ${picocolors.redBright("<3")} to ${picocolors.underline("cs.rin.ru")} ~ Cy`,
+            ),
+        )
+    }
+
+    if (
+        getFlag("updateChecking") === true &&
+        getFlag("bypassEntitlementsCheck") === true
+    ) {
+        log(
+            LogLevel.INFO,
+            "Get your updates from here: https://cs.rin.ru/forum/viewtopic.php?p=3002498#p3002498",
         )
     }
 

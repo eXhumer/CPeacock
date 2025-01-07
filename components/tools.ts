@@ -23,7 +23,7 @@ import { PEACOCKVERSTRING } from "./utils"
 import md5File from "md5-file"
 import { arch, cpus as cpuList, platform, version } from "os"
 import { Controller, isPlugin } from "./controller"
-import { getAllFlags } from "./flags"
+import { getFlag, getAllFlags } from "./flags"
 import axios from "axios"
 import { Stream } from "stream"
 import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs"
@@ -55,7 +55,10 @@ export async function toolsMenu(options: { skip: boolean }) {
         choices: [
             {
                 title: "Export debug info",
-                description: "Export helpful information for the developers.",
+                description:
+                    getFlag("bypassEntitlementsCheck") === true
+                        ? "This option is disabled since the devs do not support piracy."
+                        : "Export helpful information for the developers.",
                 value: "debug",
             },
             {
@@ -74,7 +77,23 @@ export async function toolsMenu(options: { skip: boolean }) {
 
     switch (init.actions) {
         case "debug":
-            await exportDebugInfo(options.skip)
+            if (getFlag("bypassEntitlementsCheck") === true) {
+                log(
+                    LogLevel.WARN,
+                    picocolors.yellowBright(
+                        "You are a pirate, there is no need to export debug info, as you shouldn't be wasting peacock support's time with your issues!",
+                    ),
+                )
+                log(
+                    LogLevel.WARN,
+                    picocolors.yellowBright(
+                        "If you need help with the crack you should contact Cybah on rin instead: https://cs.rin.ru/forum/ucp.php?i=pm&mode=compose&u=1656085",
+                    ),
+                )
+            } else {
+                await exportDebugInfo(options.skip)
+            }
+
             break
         case "download-images":
             await downloadImagePack()
