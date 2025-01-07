@@ -43,6 +43,7 @@ import {
     SteamH2Strategy,
     SteamScpcStrategy,
 } from "./entitlementStrategies"
+import { getFlag } from "./flags"
 
 export const JWT_SECRET = PEACOCK_DEV
     ? "secret"
@@ -108,18 +109,22 @@ export async function handleOAuthToken(
             return error400 // invalid epic user id
         }
 
-        const epic_token = decode(
-            req.body.access_token.replace(/^eg1~/, ""),
-        ) as {
-            appid: string
-            app: string
+        let epic_token = undefined
+
+        if (getFlag("bypassEntitlementsCheck") === false) {
+            epic_token = decode(req.body.access_token.replace(/^eg1~/, "")) as {
+                appid: string
+                app: string
+            }
+
+            if (!epic_token || !(epic_token.appid || epic_token.app)) {
+                return error400 // invalid epic access token
+            }
         }
 
-        if (!epic_token || !(epic_token.appid || epic_token.app)) {
-            return error400 // invalid epic access token
-        }
-
-        external_appid = epic_token.appid || epic_token.app
+        external_appid = !epic_token
+            ? "fghi4567xQOCheZIin0pazB47qGUvZw4"
+            : epic_token.appid || epic_token.app
         external_platform = "epic"
         external_userid = req.body.epic_userid || ""
         external_users_folder = "epicids"
@@ -136,7 +141,7 @@ export async function handleOAuthToken(
         // @ts-expect-error Non-optional, we're reassigning.
         delete req.jwt.aud // audience
 
-        if (!isScpc) {
+        if (!isScpc && getFlag("bypassEntitlementsCheck") === false) {
             if (userAuths.has(req.jwt.unique_name)) {
                 userAuths
                     .get(req.jwt.unique_name)!
@@ -232,7 +237,9 @@ export async function handleOAuthToken(
 
         userAuths.set(req.body.pId, authContainer)
 
-        await authContainer._initiallyAuthenticate(req)
+        if (getFlag("bypassEntitlementsCheck") === false) {
+            await authContainer._initiallyAuthenticate(req)
+        }
     }
 
     let userData = getUserData(req.body.pId, gameVersion)
